@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class BeverageController {
+    ReentrantLock lock = new ReentrantLock();
     private IngredientController ingredientController1;
     private List<Beverage> beverages = new ArrayList<Beverage>();
 
-    public BeverageController(IngredientController ingredientController){
+    public BeverageController(IngredientController ingredientController) {
         ingredientController1 = ingredientController;
         Ingredient sugar = ingredientController1.getIngredientByName("sugar_syrup");
         Ingredient water = ingredientController1.getIngredientByName("hot_water");
@@ -20,7 +22,6 @@ public class BeverageController {
         Ingredient tea_leaves_syrup = ingredientController1.getIngredientByName("tea_leaves_syrup");
         Ingredient ginger_syrup = ingredientController1.getIngredientByName("ginger_syrup");
         Ingredient green_mixture = ingredientController1.getIngredientByName("green_mixture");
-
 
         Map<Ingredient, Integer> beverage1Requirement = new HashMap<Ingredient, Integer>();
         beverage1Requirement.put(water, 200);
@@ -35,7 +36,6 @@ public class BeverageController {
         beverage2Requirement.put(milk, 400);
         beverage2Requirement.put(sugar, 50);
         beverage2Requirement.put(tea_leaves_syrup, 30);
-
 
         Map<Ingredient, Integer> beverage3Requirement = new HashMap<Ingredient, Integer>();
         beverage3Requirement.put(water, 300);
@@ -60,16 +60,19 @@ public class BeverageController {
         beverages.add(beverage4);
 
     }
+
     public Beverage getBeverageByName(String beverageName) {
         Beverage dummyBeverage = Beverage.builder().build();
-        for(Beverage beverage : beverages) {
-            if(beverage.getBeverageName().equalsIgnoreCase(beverageName)) {
+        for (Beverage beverage : beverages) {
+            if (beverage.getBeverageName().equalsIgnoreCase(beverageName)) {
                 return beverage;
             }
         }
         return dummyBeverage;
     }
-    public boolean canBeServed(Beverage beverage) {
+
+    private boolean canBeServed(Beverage beverage) {
+
         for (Map.Entry<Ingredient, Integer> requirement : beverage.getRequirements().entrySet()) {
             if (requirement.getValue() > requirement.getKey().getCurrentQuantity()) {
                 return false;
@@ -78,16 +81,39 @@ public class BeverageController {
         return true;
     }
 
-    public void serveBeverage(Beverage beverage) {
-        for(Map.Entry<Ingredient, Integer> requirement : beverage.getRequirements().entrySet()) {
+    public boolean serveBeverage(Beverage beverage) {
+
+        lock.lock();
+        for (Map.Entry<Ingredient, Integer> requirement : beverage.getRequirements().entrySet()) {
+            while (requirement.getKey().getLockStatus()) {
+                continue;
+            }
+            requirement.getKey().getLock().lock();
+        }
+        lock.unlock();
+
+        if (!canBeServed(beverage)) {
+            unlockIngredients(beverage);
+            return false;
+        }
+        for (Map.Entry<Ingredient, Integer> requirement : beverage.getRequirements().entrySet()) {
+
             ingredientController1.decreaseIngredient(requirement.getKey(), requirement.getValue());
+        }
+        unlockIngredients(beverage);
+        return true;
+    }
+
+    private void unlockIngredients(Beverage beverage) {
+        for (Map.Entry<Ingredient, Integer> requirement : beverage.getRequirements().entrySet()) {
+            requirement.getKey().getLock().unlock();
         }
     }
 
     public void giveReasonForNotServing(Beverage beverage) {
-        for(Map.Entry<Ingredient, Integer> requirement : beverage.getRequirements().entrySet()) {
-            if(requirement.getValue() > requirement.getKey().getCurrentQuantity()) {
-                System.out.println(requirement.getKey().getIngredientName() + " is not sufficient!");
+        for (Map.Entry<Ingredient, Integer> requirement : beverage.getRequirements().entrySet()) {
+            if (requirement.getValue() > requirement.getKey().getCurrentQuantity()) {
+                System.out.println(requirement.getKey().getIngredientName() + " is not sufficient " + beverage.getBeverageName());
             }
         }
     }
