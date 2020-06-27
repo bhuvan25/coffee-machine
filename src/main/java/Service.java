@@ -14,6 +14,7 @@ import static java.lang.System.exit;
 public class Service {
 
     private static MachineController machineController;
+    static String[] beverageOptions = {" ","hot_tea","hot_coffee","black_tea", "green_tea"};
 
     public static void main(String[] args) throws IOException, InterruptedException {
         initializeMachine();
@@ -29,7 +30,7 @@ public class Service {
 
     private static void mainView() throws IOException, InterruptedException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        String beverageName, ingredientName;
+        String ingredientName;
         int option, quantity;
         int number = 4;
         System.out.println("Press 1 to serve beverage");
@@ -40,13 +41,13 @@ public class Service {
         if (option == 1) {
 
             List<String> beverageInput = new ArrayList<>();
-            System.out.println("Provide beverage name or press enter for main menu");
+            System.out.println("Please enter option\n1. Hot Tea \n 2.Hot Coffee \n 3.Black Tea \n 4. Green Tea\n 0. start process");
             for (int i = 0; i < number; i++) {
 
-                beverageName = reader.readLine();
-                if (beverageName.equals(""))
+                int beverageOption = Integer.parseInt(reader.readLine());
+                if (beverageOption==0)
                     break;
-                beverageInput.add(beverageName);
+                beverageInput.add(beverageOptions[beverageOption]);
 
             }
             int inputSize = beverageInput.size();

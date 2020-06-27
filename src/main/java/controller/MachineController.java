@@ -13,6 +13,13 @@ public class MachineController {
 
     }
 
+    /***
+     * fucntion that will check if we can serve or not a particular beverage
+     * if we can: call serveBeverage in BeverageController class
+     * if not, call giveReasonForNotServing in BeverageController class
+     * @param beverageName
+     * @throws InterruptedException
+     */
     public void serveBeverage(String beverageName) throws InterruptedException {
         Beverage beverage = beverageController.getBeverageByName(beverageName);
 

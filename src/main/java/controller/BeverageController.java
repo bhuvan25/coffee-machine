@@ -71,6 +71,12 @@ public class BeverageController {
         return dummyBeverage;
     }
 
+    /***
+     * to check if we can serve the beverage
+     * @param beverage
+     * @return true/false
+     */
+
     private boolean canBeServed(Beverage beverage) {
 
         for (Map.Entry<Ingredient, Integer> requirement : beverage.getRequirements().entrySet()) {
@@ -81,6 +87,10 @@ public class BeverageController {
         return true;
     }
 
+    /***function to check if i cna serve the beverage
+      if i can serve the beverage do and print that the beverage is served
+      if i cannot serve the beverage then return back false
+    ***/
     public boolean serveBeverage(Beverage beverage) {
 
         lock.lock();
@@ -110,6 +120,10 @@ public class BeverageController {
         }
     }
 
+    /***
+     * if we are not able to serve the beverage , give the reason for that
+     * @param beverage
+     */
     public void giveReasonForNotServing(Beverage beverage) {
         for (Map.Entry<Ingredient, Integer> requirement : beverage.getRequirements().entrySet()) {
             if (requirement.getValue() > requirement.getKey().getCurrentQuantity()) {

@@ -28,6 +28,11 @@ public class IngredientController {
         return Ingredient.builder().build();
     }
 
+    /***
+     * to fill the ingredient in the machine when the option is selected for that
+     * @param ingredient which ingredient we want to fill
+     * @param quantity the quantuty of that ingredient we want to fill
+     */
     public void fillIngredient(Ingredient ingredient, int quantity) {
         if (ingredient.getCurrentQuantity() + quantity > ingredient.getMaxQuantity()) {
             ingredient.setCurrentQuantity(ingredient.getMaxQuantity());
@@ -36,6 +41,11 @@ public class IngredientController {
         }
     }
 
+    /***
+     * to decrease the quantity of the particular ingredient
+     * @param ingredient the ingredient name
+     * @param quantity the amount by which it will decrement
+     */
     public void decreaseIngredient(Ingredient ingredient, int quantity) {
         if (ingredient.getCurrentQuantity() - quantity >= 0) {
             ingredient.setCurrentQuantity(ingredient.getCurrentQuantity() - quantity);
